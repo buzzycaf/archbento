@@ -1,5 +1,5 @@
-# dotfiles
-My own Archlinux install in the vein of Omarchy.
+# Archbento 🍱
+A curated, intentional Arch Linux setup — inspired by Omarchy.
 
 No secrets in this repo
 
@@ -11,7 +11,7 @@ Machine-specific configs belong elsewhere
    sudo pacman -S git
    mkdir -p ~/git_repositories
    cd ~/git_repositories
-   git clone https://github.com/buzzycaf/dotfiles
+   git clone https://github.com/buzzycaf/archbento
    cd dotfiles
    chmod +x install.sh
    ./install.sh
@@ -21,3 +21,5 @@ Machine-specific configs belong elsewhere
    chsh -s /bin/zsh
    ```
 3. Log off and back in again, or reboot.
+
+This repository is private and intended for personal use.
