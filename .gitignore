@@ -14,3 +14,22 @@ tmp/
 # Secrets (just in case)
 secrets*
 private*
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor junk
+*.swp
+*.swo
+*~
+.nvimlog
+
+# Zsh generated files
+.zcompdump*
+.zsh_history
+.zsh_sessions/
+
+# If you keep untracked machine-local overrides inside the repo:
+local/
+machines/**/secrets/
