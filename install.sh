@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# dotfiles install script
-# - backs up existing targets
-# - symlinks repo files into ~/.config and ~/
-# - safe to re-run
-
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP_DIR="${HOME}/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
 
@@ -30,11 +25,9 @@ backup_if_exists() {
 link_file() {
   local src="$1"
   local dst="$2"
-
-  # Expand ~ in dst safely
   dst="${dst/#\~/$HOME}"
 
-  # If dst is already the correct symlink, do nothing
+  # Already linked correctly?
   if [[ -L "$dst" ]]; then
     local current
     current="$(readlink "$dst")"
@@ -53,8 +46,8 @@ link_file() {
 link_dir_contents() {
   local src_dir="$1"
   local dst_dir="$2"
-
   mkdir -p "$dst_dir"
+
   shopt -s nullglob
   for item in "$src_dir"/*; do
     local base
@@ -63,37 +56,85 @@ link_dir_contents() {
   done
 }
 
+install_packages() {
+  # git is intentionally NOT included (you needed it to clone this repo)
+  local pkgs=(
+    neovim less man-db man-pages
+    base-devel curl wget ripgrep fd unzip zip tar
+    tree bat which
+    htop lsof pciutils usbutils
+    networkmanager
+    gnupg openssh
+    dosfstools e2fsprogs ntfs-3g
+    fzf zoxide zsh starship
+  )
+
+  log "Installing foundation packages (excluding git)..."
+  sudo pacman -S --needed --noconfirm "${pkgs[@]}"
+}
+
+enable_networking() {
+  log "Enabling NetworkManager..."
+  sudo systemctl enable --now NetworkManager
+}
+
+link_dotfiles() {
+  log "Linking dotfiles from $REPO_DIR"
+  log "Backup dir: $BACKUP_DIR (only created if backups needed)"
+
+  # zsh dotfiles
+  [[ -f "$REPO_DIR/zsh/zshrc" ]]     && link_file "$REPO_DIR/zsh/zshrc" "$HOME/.zshrc"
+  [[ -f "$REPO_DIR/zsh/zprofile" ]]  && link_file "$REPO_DIR/zsh/zprofile" "$HOME/.zprofile"
+
+  # starship
+  if [[ -f "$REPO_DIR/starship/starship.toml" ]]; then
+    mkdir -p "$HOME/.config"
+    link_file "$REPO_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
+  elif [[ -d "$REPO_DIR/starship" ]]; then
+    link_dir_contents "$REPO_DIR/starship" "$HOME/.config/starship"
+  fi
+
+  # optional future: hypr/waybar/ghostty
+  [[ -d "$REPO_DIR/hypr"    ]] && link_dir_contents "$REPO_DIR/hypr"    "$HOME/.config/hypr"
+  [[ -d "$REPO_DIR/waybar"  ]] && link_dir_contents "$REPO_DIR/waybar"  "$HOME/.config/waybar"
+  [[ -d "$REPO_DIR/ghostty" ]] && link_dir_contents "$REPO_DIR/ghostty" "$HOME/.config/ghostty"
+
+  log "Dotfiles linking complete."
+  if [[ -d "$BACKUP_DIR" ]]; then
+    log "Backups saved in: $BACKUP_DIR"
+  fi
+}
+
+set_zsh_shell() {
+  # Don’t force it—only change if user confirms via env var
+  # Usage: DOTFILES_SET_SHELL=1 ./install.sh
+  if [[ "${DOTFILES_SET_SHELL:-0}" == "1" ]]; then
+    log "Setting default shell to zsh for user $USER..."
+    need_cmd zsh
+    chsh -s "$(command -v zsh)"
+    log "Shell changed. Log out and back in, or run: exec zsh"
+  else
+    log "Skipping shell change. To set zsh as default, run:"
+    echo "    DOTFILES_SET_SHELL=1 ./install.sh"
+  fi
+}
+
 main() {
+  need_cmd readlink
   need_cmd ln
   need_cmd mv
   need_cmd mkdir
   need_cmd date
-  need_cmd readlink
 
-  log "Dotfiles repo: $REPO_DIR"
-  log "Backup dir:   $BACKUP_DIR"
+  # If pacman exists, we’re on Arch (or Arch-based)
+  need_cmd pacman
 
-  # --- Root dotfiles (if you store them under zsh/) ---
-  if [[ -f "$REPO_DIR/zsh/zshrc" ]]; then
-    link_file "$REPO_DIR/zsh/zshrc" "$HOME/.zshrc"
-  fi
-  if [[ -f "$REPO_DIR/zsh/zprofile" ]]; then
-    link_file "$REPO_DIR/zsh/zprofile" "$HOME/.zprofile"
-  fi
+  install_packages
+  enable_networking
+  link_dotfiles
+  set_zsh_shell
 
-  # --- ~/.config mappings ---
-  if [[ -d "$REPO_DIR/starship" ]]; then
-    # expects starship/starship.toml
-    if [[ -f "$REPO_DIR/starship/starship.toml" ]]; then
-      link_file "$REPO_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
-    else
-      # If you instead keep config in starship/ as multiple files, link the folder
-      link_dir_contents "$REPO_DIR/starship" "$HOME/.config/starship"
-    fi
-  fi
+  log "All done."
+}
 
-  if [[ -d "$REPO_DIR/hypr" ]]; then
-    link_dir_contents "$REPO_DIR/hypr" "$HOME/.config/hypr"
-  fi
-
-  if [[ -d "$REPO_DIR_]()]()
+main "$@"
