@@ -1,3 +1,11 @@
+## Project Status
+
+Archbento is currently in early development and primarily serves as a
+learning project.
+
+Pull requests are not being accepted at this time.
+Issues may be closed without response.
+
 # Archbento 🍱
 
 **Archbento** is an opinionated, minimal Arch Linux bootstrap focused on a clean,
