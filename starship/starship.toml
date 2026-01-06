@@ -1,41 +1,46 @@
 add_newline = true
 
+# Segment bar on line 1, prompt on line 2
 format = """
 $directory$git_branch$git_status
 $character"""
 
-right_format = "$username$hostname"
+# Right side segment (time)
+right_format = "$time"
 
-# ---------- Left side blocks ----------
+# -----------------
+# Left segments
+# -----------------
 
 [directory]
 style = "black bold bg:blue"
-format = "[ $path ]($style)"
+format = "[ $path ]($style) "
 truncate_to_repo = false
 
 [git_branch]
-style = "black bold bg:bright-blue"
+style = "black bold bg:green"
 symbol = ""
-format = "[ $branch ]($style)"
+format = "[ on $branch ]($style) "
 
+# Keep status in the same green "band"
 [git_status]
-style = "black bg:cyan"
-format = "[ $all_status$ahead_behind ]($style)"
+style = "black bold bg:green"
+format = "[ $all_status$ahead_behind ]($style) "
 
-# Prompt character (keep simple and readable)
+# -----------------
+# Right segment
+# -----------------
+
+[time]
+disabled = false
+time_format = "%I:%M:%S %p"
+style = "black bold bg:bright-black"
+format = "[ at $time ]($style)"
+
+# -----------------
+# Prompt char (line 2)
+# -----------------
+
 [character]
 success_symbol = "[>](bold blue) "
 error_symbol = "[>](bold red) "
-
-# ---------- Right side block ----------
-
-[username]
-show_always = true
-style_user = "black bold bg:cyan"
-style_root = "black bold bg:blue"
-format = "[ $user]($style_user)"
-
-[hostname]
-ssh_only = false
-style = "black bold bg:cyan"
-format = "[@$hostname ]($style)"
