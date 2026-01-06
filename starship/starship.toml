@@ -1,14 +1,12 @@
 add_newline = true
 
-# Left prompt: info on line 1, cursor on line 2
 format = """
 $directory$git_branch$git_status
 $character"""
 
-# Right prompt: user@host block
 right_format = "$username$hostname"
 
-# ---------- Left side blocks ----------
+# ---------- Left side (blue tones) ----------
 
 [directory]
 style = "black bold bg:blue"
@@ -16,25 +14,25 @@ format = "[ $path ]($style)"
 truncate_to_repo = false
 
 [git_branch]
-style = "black bold bg:magenta"
+style = "black bold bg:bright-blue"
 symbol = ""
 format = "[ $branch ]($style)"
 
 [git_status]
-style = "black bold bg:yellow"
+style = "black bg:cyan"
 format = "[ $all_status$ahead_behind ]($style)"
 
-# Prompt character (second line)
+# Prompt character
 [character]
-success_symbol = "[>](bold green) "
+success_symbol = "[>](bold blue) "
 error_symbol = "[>](bold red) "
 
-# ---------- Right side block ----------
+# ---------- Right side (blue tone capsule) ----------
 
 [username]
 show_always = true
 style_user = "black bold bg:cyan"
-style_root = "white bold bg:red"
+style_root = "white bold bg:blue"
 format = "[ $user]($style_user)"
 
 [hostname]
