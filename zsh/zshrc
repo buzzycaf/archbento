@@ -1,3 +1,6 @@
+# Only run interactive config in interactive shells
+[[ -o interactive ]] || return
+
 # --- Prompt ---
 eval "$(starship init zsh)"
 
@@ -5,7 +8,7 @@ eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 
 # --- fzf integration ---
-# Keybindings & completion
+# Keybindings & completion (source once)
 if [[ -r /usr/share/fzf/key-bindings.zsh ]]; then
   source /usr/share/fzf/key-bindings.zsh
 fi
@@ -16,57 +19,52 @@ fi
 # Use fd for fzf listings
 export FZF_DEFAULT_COMMAND='fd --hidden --follow --exclude .git'
 
-# fzf previews
-export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range :300 {}' --preview-window=right,60%"
-export FZF_ALT_C_OPTS="--preview 'ls -la --color=always {} | head -200' --preview-window=right,60%"
-
-# fzf keybindings and completion
-if [[ -r /usr/share/fzf/key-bindings.zsh ]]; then
-  source /usr/share/fzf/key-bindings.zsh
+# fzf previews (guard bat)
+if command -v bat >/dev/null 2>&1; then
+  export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range :300 {}' --preview-window=right,60%"
+else
+  export FZF_CTRL_T_OPTS="--preview 'sed -n 1,300p {}' --preview-window=right,60%"
 fi
+export FZF_ALT_C_OPTS="--preview 'ls -la {} 2>/dev/null | head -200' --preview-window=right,60%"
 
-if [[ -r /usr/share/fzf/completion.zsh ]]; then
-  source /usr/share/fzf/completion.zsh
-fi
-
-# Keybindings
+# --- Keybindings ---
 bindkey -e
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
-# Fix Home/End keys for all terminals (xterm, Konsole, Wayland, etc.)
-bindkey '\e[1~' beginning-of-line   # Home
-bindkey '\e[4~' end-of-line         # End
-bindkey '\e[H' beginning-of-line
-bindkey '\e[F' end-of-line
-bindkey '\eOH' beginning-of-line
-bindkey '\eOF' end-of-line
-# Page Up / Page Down bindings
+
+# Home/End/Delete/PageUp/PageDown compatibility
+bindkey '\e[1~' beginning-of-line
+bindkey '\e[4~' end-of-line
+bindkey '\e[H'  beginning-of-line
+bindkey '\e[F'  end-of-line
+bindkey '\eOH'  beginning-of-line
+bindkey '\eOF'  end-of-line
 bindkey '\e[5~' up-line-or-history
 bindkey '\e[6~' down-line-or-history
-bindkey '\e[5;5~' up-line-or-history     # Ctrl+PageUp variations
-bindkey '\e[6;5~' down-line-or-history   # Ctrl+PageDown variations
-# Fix Home / End keys in Konsole
-bindkey '^[[H' beginning-of-line
-bindkey '^[[F' end-of-line
-# Alternative escape sequences (some terminals)
-bindkey '^[[1~' beginning-of-line
-bindkey '^[[4~' end-of-line
-# Fix Delete key in Konsole
+bindkey '\e[5;5~' up-line-or-history
+bindkey '\e[6;5~' down-line-or-history
 bindkey '^[[3~' delete-char
 
-# Kill processes with fzf
+# --- Aliases ---
+[[ -f "$HOME/.zsh/aliases.zsh" ]] && source "$HOME/.zsh/aliases.zsh"
+
+# --- Helpers ---
 fkill() {
   local pid
   pid=$(ps -u "$USER" -o pid,comm,%cpu,%mem --sort=-%cpu | sed 1d | fzf --prompt='kill> ' | awk '{print $1}') || return
   kill -9 "$pid"
 }
 
-# Fuzzy jump into a subdirectory of the current dir
 cdf() {
   local dir
-  dir=$(fd --type d --hidden --follow --exclude .git . "${1:-.}" | fzf --prompt='cd> ' --preview 'ls -la --color=always {} | head -200') || return
+  dir=$(fd --type d --hidden --follow --exclude .git . "${1:-.}" | fzf --prompt='cd> ' --preview 'ls -la {} 2>/dev/null | head -200') || return
   cd "$dir"
 }
 
-# Show stats
-fastfetch
+# --- Show stats (only once per login) ---
+if command -v fastfetch >/dev/null 2>&1; then
+  if [[ -z "${ARCHBENTO_FASTFETCH_SHOWN:-}" ]]; then
+    export ARCHBENTO_FASTFETCH_SHOWN=1
+    fastfetch
+  fi
+fi

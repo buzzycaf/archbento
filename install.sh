@@ -106,7 +106,7 @@ install_packages() {
     base-devel curl wget ripgrep fd unzip zip tar
     tree bat which
     htop lsof pciutils usbutils
-    networkmanager
+    networkmanager iperf3
     gnupg openssh nano
     dosfstools e2fsprogs ntfs-3g
     fzf zoxide zsh starship fastfetch
@@ -129,8 +129,8 @@ enable_networking() {
 link_dotfiles() {
   log "Linking dotfiles from $REPO_DIR"
 
-  [[ -f "$REPO_DIR/zsh/zshrc" ]]    && link_file "$REPO_DIR/zsh/zshrc" "$HOME/.zshrc"
-  [[ -f "$REPO_DIR/zsh/zprofile" ]] && link_file "$REPO_DIR/zsh/zprofile" "$HOME/.zprofile"
+  [[ -f "$REPO_DIR/zsh/zshrc" ]]     && link_file "$REPO_DIR/zsh/zshrc" "$HOME/.zshrc"
+  [[ -f "$REPO_DIR/zsh/zprofile" ]]  && link_file "$REPO_DIR/zsh/zprofile" "$HOME/.zprofile"
 
   if [[ -f "$REPO_DIR/starship/starship.toml" ]]; then
     run "mkdir -p '$HOME/.config'"
@@ -141,6 +141,10 @@ link_dotfiles() {
   if [[ -f "$REPO_DIR/fastfetch/config.jsonc" ]]; then
     link_file "$REPO_DIR/fastfetch/config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
   fi
+
+  # zsh extra files
+  run "mkdir -p '$HOME/.zsh'"
+  [[ -f "$REPO_DIR/zsh/aliases.zsh" ]] && link_file "$REPO_DIR/zsh/aliases.zsh" "$HOME/.zsh/aliases.zsh"
 
   [[ -d "$REPO_DIR/hypr"    ]] && link_dir_contents "$REPO_DIR/hypr"    "$HOME/.config/hypr"
   [[ -d "$REPO_DIR/waybar"  ]] && link_dir_contents "$REPO_DIR/waybar"  "$HOME/.config/waybar"
