@@ -5,9 +5,19 @@ format = """
 $directory$git_branch$git_status
 $character"""
 
-# Right prompt: user@host block
-right_format = """
-$custom.userhost"""
+# Right prompt: username@hostname block
+right_format = "$username$hostname"
+
+[username]
+show_always = true
+style_user = "black bold bg:cyan"
+style_root = "white bold bg:red"
+format = "[ $user]($style_user)"
+
+[hostname]
+ssh_only = false
+style = "black bold bg:cyan"
+format = "[@$hostname ]($style)"
 
 # ---------- Blocks (left) ----------
 
