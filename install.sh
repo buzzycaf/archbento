@@ -107,9 +107,9 @@ install_packages() {
     tree bat which
     htop lsof pciutils usbutils
     networkmanager
-    gnupg openssh
+    gnupg openssh nano
     dosfstools e2fsprogs ntfs-3g
-    fzf zoxide zsh starship
+    fzf zoxide zsh starship fastfetch
   )
 
   log "Installing foundation packages (excluding git)..."
@@ -135,6 +135,11 @@ link_dotfiles() {
   if [[ -f "$REPO_DIR/starship/starship.toml" ]]; then
     run "mkdir -p '$HOME/.config'"
     link_file "$REPO_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
+  fi
+
+  # fastfetch
+  if [[ -f "$REPO_DIR/fastfetch/config.jsonc" ]]; then
+    link_file "$REPO_DIR/fastfetch/config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
   fi
 
   [[ -d "$REPO_DIR/hypr"    ]] && link_dir_contents "$REPO_DIR/hypr"    "$HOME/.config/hypr"

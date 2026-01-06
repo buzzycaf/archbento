@@ -29,6 +29,31 @@ if [[ -r /usr/share/fzf/completion.zsh ]]; then
   source /usr/share/fzf/completion.zsh
 fi
 
+# Keybindings
+bindkey -e
+bindkey '^p' history-search-backward
+bindkey '^n' history-search-forward
+# Fix Home/End keys for all terminals (xterm, Konsole, Wayland, etc.)
+bindkey '\e[1~' beginning-of-line   # Home
+bindkey '\e[4~' end-of-line         # End
+bindkey '\e[H' beginning-of-line
+bindkey '\e[F' end-of-line
+bindkey '\eOH' beginning-of-line
+bindkey '\eOF' end-of-line
+# Page Up / Page Down bindings
+bindkey '\e[5~' up-line-or-history
+bindkey '\e[6~' down-line-or-history
+bindkey '\e[5;5~' up-line-or-history     # Ctrl+PageUp variations
+bindkey '\e[6;5~' down-line-or-history   # Ctrl+PageDown variations
+# Fix Home / End keys in Konsole
+bindkey '^[[H' beginning-of-line
+bindkey '^[[F' end-of-line
+# Alternative escape sequences (some terminals)
+bindkey '^[[1~' beginning-of-line
+bindkey '^[[4~' end-of-line
+# Fix Delete key in Konsole
+bindkey '^[[3~' delete-char
+
 # Kill processes with fzf
 fkill() {
   local pid
@@ -42,3 +67,6 @@ cdf() {
   dir=$(fd --type d --hidden --follow --exclude .git . "${1:-.}" | fzf --prompt='cd> ' --preview 'ls -la --color=always {} | head -200') || return
   cd "$dir"
 }
+
+# Show stats
+fastfetch
