@@ -1,48 +1,43 @@
 add_newline = true
 
-# Left prompt: blocks on line 1, prompt char on line 2
+# Left prompt: info on line 1, cursor on line 2
 format = """
 $directory$git_branch$git_status
 $character"""
 
-# Right prompt: username@hostname block
+# Right prompt: user@host block
 right_format = "$username$hostname"
+
+# ---------- Left side blocks ----------
+
+[directory]
+style = "black bold bg:blue"
+format = "[ $path ]($style)"
+truncate_to_repo = false
+
+[git_branch]
+style = "black bold bg:magenta"
+symbol = ""
+format = "[ $branch ]($style)"
+
+[git_status]
+style = "black bold bg:yellow"
+format = "[ $all_status$ahead_behind ]($style)"
+
+# Prompt character (second line)
+[character]
+success_symbol = "[>](bold green) "
+error_symbol = "[>](bold red) "
+
+# ---------- Right side block ----------
 
 [username]
 show_always = true
 style_user = "black bold bg:cyan"
 style_root = "white bold bg:red"
-format = "[ $user]($style_user)"
+format = "[ $user]($style_user)"
 
 [hostname]
 ssh_only = false
 style = "black bold bg:cyan"
-format = "[@$hostname ]($style)"
-
-# ---------- Blocks (left) ----------
-
-[directory]
-style = "black bold bg:blue"
-format = "[$path]($style)"
-truncate_to_repo = false
-
-[git_branch]
-symbol = " "
-style = "black bold bg:magenta"
-format = "[$symbol$branch]($style)"
-
-[git_status]
-style = "black bold bg:yellow"
-format = "[$all_status$ahead_behind]($style)"
-
-# Prompt character on its own line
-[character]
-success_symbol = "[❯](bold green) "
-error_symbol = "[❯](bold red) "
-
-# ---------- Right side block: username@hostname ----------
-
-[custom.userhost]
-# Always show. If you only want this on SSH later, I’ll adjust.
-when = "true"
-format = "[ $USER@$HOSTNAME ](black bold bg:cyan)"
+format = "[@$hostname ]($style)"
