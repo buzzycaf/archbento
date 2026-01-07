@@ -1,4 +1,3 @@
-````md
 # Archbento Installer Modules
 
 Archbento uses a **modular installer design** to keep the core system, GUI stack, and future extensions cleanly separated.

@@ -226,7 +226,6 @@ main() {
 
   # Core system install
   core_install_packages
-  core_enable_networking
   core_install_yay
 
   # Optional GUI install

@@ -1,1 +1,16 @@
+# --- Hyprland autostart (TTY-only, no display manager) ---
+# Start Hyprland only on the first local TTY, never over SSH,
+# and avoid starting if we're already in a graphical session.
+
+if [[ -z "${WAYLAND_DISPLAY:-}" && -z "${DISPLAY:-}" ]]; then
+  if [[ -z "${SSH_CONNECTION:-}" && -z "${SSH_TTY:-}" ]]; then
+    if [[ "$(tty)" == "/dev/tty1" ]]; then
+      if command -v Hyprland >/dev/null 2>&1; then
+        exec Hyprland
+      else
+        echo "Hyprland not installed yet. Skipping autostart."
+      fi
+    fi
+  fi
+fi
 

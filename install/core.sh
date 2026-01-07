@@ -3,7 +3,7 @@ set -euo pipefail
 
 core_install_packages() {
   # Honor flags
-  [[ "$NO_PACKAGES" == "1" ]] && { log "Skipping core package install (--no-packages)"; return; }
+  [[ "$NO_PACKAGES" == "1" ]] && { log "Skipping core package install "; return; }
 
   # Core packages only (no GUI). git intentionally excluded.
   local pkgs=(
