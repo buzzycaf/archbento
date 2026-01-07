@@ -1,0 +1,10 @@
+{
+  "colorscheme": "default",
+  "tabsize": 2,
+  "tabstospaces": true,
+  "autosave": 0,
+  "clipboard": "external",
+  "statusline": true,
+  "softwrap": true,
+  "scrollbar": false
+}

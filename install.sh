@@ -112,14 +112,15 @@ install_packages() {
 
   # git intentionally excluded (needed to clone this repo)
   local pkgs=(
-    neovim less man-db man-pages
+    micro less man-db man-pages
     base-devel curl wget ripgrep fd unzip zip tar
     tree bat which dnsutils
     htop lsof pciutils usbutils
-    networkmanager iperf3
-    gnupg openssh nano rsync ethtool
+    networkmanager iperf3 tmux
+    gnupg openssh rsync ethtool
     dosfstools e2fsprogs ntfs-3g
     fzf zoxide zsh starship fastfetch
+    wl-clipboard
   )
 
   log "Installing foundation packages (excluding git)..."
@@ -174,6 +175,16 @@ link_dotfiles() {
   # fastfetch
   if [[ -f "$REPO_DIR/fastfetch/config.jsonc" ]]; then
     link_file "$REPO_DIR/fastfetch/config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
+  fi
+
+  # micro editor
+  if [[ -d "$REPO_DIR/micro" ]]; then
+    link_dir_contents "$REPO_DIR/micro" "$HOME/.config/micro"
+  fi
+
+  # tmux
+  if [[ -f "$REPO_DIR/tmux/tmux.conf" ]]; then
+    link_file "$REPO_DIR/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
   fi
 
   # zsh extra files

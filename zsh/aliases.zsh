@@ -22,3 +22,9 @@ alias gl='git log --oneline --graph --decorate'
 # System
 alias df='df -h'
 alias du='du -h'
+
+# TMUX
+alias t='tmux'
+alias ta='tmux attach -t'
+alias tl='tmux ls'
+alias tn='tmux new -s'
