@@ -147,7 +147,7 @@ ignore_base = false
 [time]
 disabled = false
 time_format = "%R"
-format = '[ $time](fg:crust bg:lavender)'
+format = '[  $time](fg:crust bg:lavender)'
 
 [line_break]
 disabled = false
