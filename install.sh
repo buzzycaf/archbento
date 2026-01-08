@@ -146,9 +146,31 @@ link_dotfiles() {
       link_file "$REPO_DIR/starship/starship.toml" "$target_home/.config/starship.toml"
   fi
 
-  # fastfetch
-  if [[ -f "$REPO_DIR/fastfetch/config.jsonc" ]]; then
-    link_file "$REPO_DIR/fastfetch/config.jsonc" "$target_home/.config/fastfetch/config.jsonc"
+    # fastfetch
+  if [[ -d "$REPO_DIR/fastfetch" ]]; then
+    run "mkdir -p '$target_home/.config/fastfetch'"
+
+    # Main config (keep for backward compatibility if you still ship it)
+    [[ -f "$REPO_DIR/fastfetch/config.jsonc" ]] && \
+      link_file "$REPO_DIR/fastfetch/config.jsonc" "$target_home/.config/fastfetch/config.jsonc"
+
+    # New split configs (TTY vs GUI)
+    [[ -f "$REPO_DIR/fastfetch/config-tty.jsonc" ]] && \
+      link_file "$REPO_DIR/fastfetch/config-tty.jsonc" "$target_home/.config/fastfetch/config-tty.jsonc"
+
+    [[ -f "$REPO_DIR/fastfetch/config-xterm.jsonc" ]] && \
+      link_file "$REPO_DIR/fastfetch/config-xterm.jsonc" "$target_home/.config/fastfetch/config-xterm.jsonc"
+
+    # logo.png should be user-owned (copy once; never overwrite)
+    if [[ -f "$REPO_DIR/fastfetch/logo.png" ]]; then
+      local user_logo="$target_home/.config/fastfetch/logo.png"
+      if [[ ! -e "$user_logo" ]]; then
+        log "Copying fastfetch logo (user-editable): $user_logo"
+        run "cp '$REPO_DIR/fastfetch/logo.png' '$user_logo'"
+      else
+        log "OK: fastfetch logo already exists (not overwriting): $user_logo"
+      fi
+    fi
   fi
 
   # micro editor

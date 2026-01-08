@@ -47,6 +47,7 @@ gui_install_tools() {
     thunar-archive-plugin
     xarchiver
     chromium
+    imagemagick
   )
 
   log "Installing GUI tools (file manager, launcher, utilities)..."
