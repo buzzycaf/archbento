@@ -6,7 +6,6 @@ palette = 'catppuccin_mocha'
 format = """
 [](red)\
 $os\
-$username\
 [](bg:peach fg:red)\
 $directory\
 [](bg:yellow fg:peach)\
@@ -32,6 +31,18 @@ $cmd_duration\
 $line_break\
 $character
 """
+
+right_format = """
+$username\
+$hostname\
+$cmd_duration
+"""
+
+[hostname]
+disabled = false
+ssh_only = false
+style = "fg:crust bg:lavender"
+format = '[@$hostname]($style)'
 
 [os]
 disabled = false
@@ -61,7 +72,7 @@ RedHatEnterprise = "󱄛"
 
 [username]
 show_always = true
-style_user = "fg:crust bg:red"
+style_user = "fg:crust bg:lavender"
 style_root = "fg:crust bg:red"
 format = '[$user]($style)'
 
