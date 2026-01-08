@@ -31,9 +31,11 @@ $character
 """
 
 right_format = """
-[]$username\
+[]\
+$username\
 $hostname\
-$cmd_duration[]\
+$cmd_duration\
+[]
 """
 
 [hostname]
