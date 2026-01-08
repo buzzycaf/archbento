@@ -12,7 +12,7 @@ gui_install_packages() {
     swww
     waybar
     ghostty
-
+    
     # Clipboard + screenshots
     wl-clipboard
     grim slurp
@@ -46,6 +46,7 @@ gui_install_tools() {
     thunar
     thunar-archive-plugin
     xarchiver
+    chromium
   )
 
   log "Installing GUI tools (file manager, launcher, utilities)..."

@@ -186,8 +186,10 @@ parse_args() {
     case "$arg" in
       --no-packages) NO_PACKAGES=1 ;;
       --dry-run)     DRY_RUN=1 ;;
-      --gui) INCLUDE_GUI=1 ;;
-      --gui-tools) INCLUDE_GUI_TOOLS=1 ;;
+      --gui)
+        INCLUDE_GUI=1
+        INCLUDE_GUI_TOOLS=1
+        ;;
       -h|--help)     usage; exit 0 ;;
       *)
         echo "Unknown option: $arg"
