@@ -85,6 +85,12 @@ cdf() {
 if command -v fastfetch >/dev/null 2>&1; then
   if [[ -z "${ARCHBENTO_FASTFETCH_SHOWN:-}" ]]; then
     export ARCHBENTO_FASTFETCH_SHOWN=1
-    fastfetch
+
+    # Pick config based on terminal
+    if [[ "$TERM" == "linux" ]]; then
+      fastfetch --config "$HOME/.config/fastfetch/config-tty.jsonc"
+    else
+      fastfetch --config "$HOME/.config/fastfetch/config-xterm.jsonc"
+    fi
   fi
 fi
