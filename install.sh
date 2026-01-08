@@ -109,12 +109,26 @@ warm_sudo() {
 link_dotfiles() {
   log "Linking dotfiles from $REPO_DIR"
 
+  # zsh
   [[ -f "$REPO_DIR/zsh/zshrc" ]]     && link_file "$REPO_DIR/zsh/zshrc" "$HOME/.zshrc"
   [[ -f "$REPO_DIR/zsh/zprofile" ]]  && link_file "$REPO_DIR/zsh/zprofile" "$HOME/.zprofile"
 
-  if [[ -f "$REPO_DIR/starship/starship.toml" ]]; then
-    run "mkdir -p '$HOME/.config'"
-    link_file "$REPO_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
+  # starship
+  if [[ -d "$REPO_DIR/starship" ]]; then
+    run "mkdir -p '$HOME/.config/starship'"
+
+    [[ -f "$REPO_DIR/starship/starship.toml" ]] && \
+      link_file "$REPO_DIR/starship/starship.toml" "$HOME/.config/starship/starship.toml"
+
+    [[ -f "$REPO_DIR/starship/starship-linux.toml" ]] && \
+      link_file "$REPO_DIR/starship/starship-linux.toml" "$HOME/.config/starship/starship-linux.toml"
+
+    [[ -f "$REPO_DIR/starship/starship-xterm.toml" ]] && \
+      link_file "$REPO_DIR/starship/starship-xterm.toml" "$HOME/.config/starship/starship-xterm.toml"
+
+    # Optional: legacy path compatibility (safe to keep)
+    [[ -f "$REPO_DIR/starship/starship.toml" ]] && \
+      link_file "$REPO_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
   fi
 
   # fastfetch
