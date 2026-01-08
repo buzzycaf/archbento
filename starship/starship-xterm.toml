@@ -34,7 +34,6 @@ right_format = """
 $username\
 $hostname\
 $cmd_duration\
-$time
 """
 
 [hostname]
