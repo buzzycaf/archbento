@@ -37,7 +37,7 @@ log() {
 # Execute a command, or just print it in dry-run mode
 run() {
   if [[ "$DRY_RUN" == "1" ]]; then
-    echo "[dry-run] $*"
+    printf '[dry-run] %s\n' "$*"
   else
     eval -- "$@"
   fi
@@ -212,6 +212,7 @@ main() {
   if [[ "$INCLUDE_GUI" == "1" ]]; then
     gui_install_packages
     gui_enable_services
+    gui_install_post_login_fixes
     [[ "$INCLUDE_GUI_TOOLS" == "1" ]] && gui_install_tools
     gui_notes
   fi

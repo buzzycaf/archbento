@@ -20,7 +20,8 @@ gui_install_packages() {
     # Portals (important for screenshare/file pickers, etc.)
     xdg-desktop-portal
     xdg-desktop-portal-hyprland
-
+    xdg-desktop-portal-gtk
+    
     # Audio (PipeWire)
     pipewire wireplumber pipewire-alsa pipewire-pulse
 
@@ -55,11 +56,69 @@ gui_install_tools() {
 }
 
 gui_enable_services() {
-  # Honor flags
   [[ "$NO_PACKAGES" == "1" ]] && { log "Skipping gui enable services (--no-packages)..."; return; }
-  # WirePlumber is typically socket/auto-started, but enabling is fine.
+
   log "Enabling user audio services (WirePlumber)..."
   run "systemctl --user enable --now wireplumber.service || true"
+
+  log "Enabling user XDG Desktop Portal services..."
+  run "systemctl --user enable --now xdg-desktop-portal.service || true"
+  run "systemctl --user enable --now xdg-desktop-portal-hyprland.service || true"
+
+  # xdg-desktop-portal-gtk is DBus/socket activated; no service enable needed.
+}
+
+gui_install_post_login_fixes() {
+  [[ "$NO_PACKAGES" == "1" ]] && { log "Skipping post-login fixes (--no-packages)..."; return; }
+
+  log "Installing post-login fixes (portals)..."
+
+  run "mkdir -p '$HOME/.local/bin' '$HOME/.local/state/archbento' '$HOME/.config/systemd/user' '$HOME/.config/hypr'"
+
+  # 1) Script: one-time portal enable/restart with a stamp file
+  run "cat > '$HOME/.local/bin/archbento-portal-fix.sh' << 'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+STAMP=\"$HOME/.local/state/archbento/portal-fixed\"
+[[ -f \"$STAMP\" ]] && exit 0
+
+mkdir -p \"\$(dirname \"\$STAMP\")\"
+
+systemctl --user enable xdg-desktop-portal.service >/dev/null 2>&1 || true
+systemctl --user enable xdg-desktop-portal-hyprland.service >/dev/null 2>&1 || true
+
+systemctl --user restart xdg-desktop-portal.service >/dev/null 2>&1 || true
+systemctl --user restart xdg-desktop-portal-hyprland.service >/dev/null 2>&1 || true
+
+touch \"$STAMP\"
+EOF"
+
+  run "chmod +x '$HOME/.local/bin/archbento-portal-fix.sh'"
+
+  # 2) User systemd unit: run once after login
+  run "cat > '$HOME/.config/systemd/user/archbento-portal-fix.service' << 'EOF'
+[Unit]
+Description=Archbento one-time XDG portal sanity check
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/archbento-portal-fix.sh
+
+[Install]
+WantedBy=default.target
+EOF"
+
+  # 3) Enable it if possible (best effort)
+  log "Enabling archbento-portal-fix user service (best effort)..."
+  run "systemctl --user daemon-reload >/dev/null 2>&1 || true"
+  run "systemctl --user enable --now archbento-portal-fix.service >/dev/null 2>&1 || true"
+
+  # 4) Hyprland fallback via dedicated include file (won't be clobbered by dotfiles)
+  run "cat > '$HOME/.config/hypr/archbento-postlogin.conf' << 'EOF'
+# Archbento: post-login one-time fixups
+exec-once = ~/.local/bin/archbento-portal-fix.sh
+EOF"
 }
 
 gui_notes() {
