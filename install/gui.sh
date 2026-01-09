@@ -76,14 +76,14 @@ gui_install_post_login_fixes() {
   run "mkdir -p '$HOME/.local/bin' '$HOME/.local/state/archbento' '$HOME/.config/systemd/user' '$HOME/.config/hypr'"
 
   # 1) Script: one-time portal enable/restart with a stamp file
-run "cat > '$HOME/.local/bin/archbento-portal-fix.sh' << 'EOF'
+  write_file "$HOME/.local/bin/archbento-portal-fix.sh" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-STAMP=\"$HOME/.local/state/archbento/portal-fixed\"
-[[ -f \"$STAMP\" ]] && exit 0
+STAMP="$HOME/.local/state/archbento/portal-fixed"
+[[ -f "$STAMP" ]] && exit 0
 
-mkdir -p \"$(dirname \"$STAMP\")\"
+mkdir -p "$(dirname "$STAMP")"
 
 systemctl --user enable xdg-desktop-portal.service >/dev/null 2>&1 || true
 systemctl --user enable xdg-desktop-portal-hyprland.service >/dev/null 2>&1 || true
@@ -91,13 +91,13 @@ systemctl --user enable xdg-desktop-portal-hyprland.service >/dev/null 2>&1 || t
 systemctl --user restart xdg-desktop-portal.service >/dev/null 2>&1 || true
 systemctl --user restart xdg-desktop-portal-hyprland.service >/dev/null 2>&1 || true
 
-touch \"$STAMP\"
-EOF"
+touch "$STAMP"
+EOF
 
   run "chmod +x '$HOME/.local/bin/archbento-portal-fix.sh'"
 
   # 2) User systemd unit: run once after login
-  run "cat > '$HOME/.config/systemd/user/archbento-portal-fix.service' << 'EOF'
+  write_file "$HOME/.config/systemd/user/archbento-portal-fix.service" <<'EOF'
 [Unit]
 Description=Archbento one-time XDG portal sanity check
 
@@ -107,7 +107,7 @@ ExecStart=%h/.local/bin/archbento-portal-fix.sh
 
 [Install]
 WantedBy=default.target
-EOF"
+EOF
 
   # 3) Enable it if possible (best effort)
   log "Enabling archbento-portal-fix user service (best effort)..."
@@ -115,10 +115,10 @@ EOF"
   run "systemctl --user enable --now archbento-portal-fix.service >/dev/null 2>&1 || true"
 
   # 4) Hyprland fallback via dedicated include file (won't be clobbered by dotfiles)
-  run "cat > '$HOME/.config/hypr/archbento-postlogin.conf' << 'EOF'
+  write_file "$HOME/.config/hypr/archbento-postlogin.conf" <<'EOF'
 # Archbento: post-login one-time fixups
 exec-once = ~/.local/bin/archbento-portal-fix.sh
-EOF"
+EOF
 }
 
 gui_notes() {
