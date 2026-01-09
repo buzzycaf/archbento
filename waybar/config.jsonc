@@ -1,1 +1,115 @@
+{
+  // Archbento Waybar v1 (Hyprland, desktop-first)
+  "layer": "top",
+  "position": "top",
+  "height": 34,
+  "spacing": 8,
 
+  // If you later want per-monitor bars, we can split into config-<monitor>.jsonc
+  // "output": ["DP-1", "DP-2"],
+
+  "modules-left": [
+    "hyprland/workspaces"
+  ],
+
+  "modules-center": [
+    "wlr/taskbar"
+  ],
+
+  "modules-right": [
+    "pulseaudio",
+    "network",
+    "cpu",
+    "memory",
+    "temperature",
+    "tray",
+    "clock"
+  ],
+
+  // ===== Left =====
+  "hyprland/workspaces": {
+    "format": "{icon}",
+    "on-scroll-up": "hyprctl dispatch workspace e+1",
+    "on-scroll-down": "hyprctl dispatch workspace e-1",
+    "persistent-workspaces": {
+      "*": 10
+    },
+    "format-icons": {
+      "active": "",
+      "default": "",
+      "urgent": ""
+    }
+  },
+
+  // ===== Center (Dock) =====
+  "wlr/taskbar": {
+    // shows running apps as icons, highlights active
+    "format": "{icon}",
+    "icon-size": 20,
+    "icon-theme": "Papirus",
+    "tooltip-format": "{title}",
+    "on-click": "activate",
+    "on-click-middle": "close",
+    "on-scroll-up": "minimize",
+    "on-scroll-down": "unminimize",
+
+    // If you *only* want pinned apps later, we’ll swap to a custom module + your launcher.
+    "sort-by-app-id": true
+  },
+
+  // ===== Right =====
+  "pulseaudio": {
+    "format": " {volume}%",
+    "format-muted": " muted",
+    "scroll-step": 5,
+    "on-click": "pavucontrol",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "tooltip": true
+  },
+
+  "network": {
+    "format-wifi": " {signalStrength}%",
+    "format-ethernet": "󰈀 {ipaddr}",
+    "format-disconnected": "󰤮 down",
+    "tooltip-format": "{ifname}\n{ipaddr}\n{essid} ({signalStrength}%)",
+    "on-click": "kitty -e nmtui"
+  },
+
+  "cpu": {
+    "format": " {usage}%",
+    "tooltip": true
+  },
+
+  "memory": {
+    "format": " {percentage}%",
+    "tooltip": true
+  },
+
+  "temperature": {
+    // This will usually pick up a hwmon source automatically.
+    // If it doesn't, we’ll set "hwmon-path" + "input-filename" later.
+    "format": " {temperatureC}°C",
+    "critical-threshold": 85,
+    "tooltip": true
+  },
+
+  "tray": {
+    "spacing": 10
+  },
+
+  "clock": {
+    "format": " {:%a %b %d  %I:%M %p}",
+    "format-alt": " {:%Y-%m-%d}",
+    "tooltip": true,
+
+    // Tooltip calendar: supported on most recent Waybar builds.
+    // If yours ignores "calendar", we’ll fall back to tooltip-format only.
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col": 3,
+      "weeks-pos": "right",
+      "on-scroll": 1
+    },
+    "tooltip-format": "<big>{:%B %Y}</big>\n<tt>{calendar}</tt>"
+  }
+}
