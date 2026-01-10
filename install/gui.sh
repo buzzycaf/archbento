@@ -13,10 +13,12 @@ gui_install_packages() {
     waybar
     ghostty
     swayimg    
+
     # Clipboard + screenshots
     wl-clipboard
     grim slurp wev
-
+    grimshot
+    
     # Portals (important for screenshare/file pickers, etc.)
     xdg-desktop-portal
     xdg-desktop-portal-hyprland
