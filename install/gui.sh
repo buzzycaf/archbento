@@ -14,7 +14,8 @@ gui_install_packages() {
     ghostty
     swayimg
     zenity    
-
+    xorg-xwayland
+    
     # Clipboard + screenshots
     wl-clipboard
     grim slurp wev
