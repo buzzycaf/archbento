@@ -31,7 +31,7 @@ INCLUDE_GUI_TOOLS=0
 # -----------------------------
 
 log() {
-  printf "\n==> %s\n" "$*"
+  printf "==> %s\n" "$*"
 }
 
 # Execute a command, or just print it in dry-run mode
