@@ -123,3 +123,13 @@ gui_notes() {
   echo "  - temporarily run: Hyprland"
   echo "  - later we’ll add a safe autostart in ~/.zprofile"
 }
+
+gui_set_gtk_dark_mode() {
+  log "Setting GTK dark mode preference (prefer-dark)..."
+
+  if command -v gsettings >/dev/null 2>&1; then
+    gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+  else
+    log "WARN: gsettings not found; GTK dark mode not applied"
+  fi
+}

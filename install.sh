@@ -228,6 +228,7 @@ main() {
     gui_install_packages
     gui_enable_services
     gui_install_post_login_fixes
+    gui_set_gtk_dark_mode
     [[ "$INCLUDE_GUI_TOOLS" == "1" ]] && gui_install_tools
     gui_notes
   fi
