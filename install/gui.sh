@@ -15,7 +15,8 @@ gui_install_packages() {
     swayimg
     zenity    
     xorg-xwayland
-    
+    papirus-icon-theme
+        
     # Clipboard + screenshots
     wl-clipboard
     grim slurp wev
