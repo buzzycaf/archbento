@@ -17,7 +17,6 @@ gui_install_packages() {
     # Clipboard + screenshots
     wl-clipboard
     grim slurp wev
-    grimshot
     
     # Portals (important for screenshare/file pickers, etc.)
     xdg-desktop-portal
