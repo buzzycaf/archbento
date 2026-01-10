@@ -40,8 +40,6 @@ From a freshly installed Arch system (TTY):
 
 ```bash
 sudo pacman -S git
-mkdir -p ~/src
-cd ~/src
 git clone https://github.com/buzzycaf/archbento
 cd archbento
 sudo ./install.sh
