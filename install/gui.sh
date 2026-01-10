@@ -32,6 +32,7 @@ gui_install_packages() {
 
     # Fonts (basic, no nerd fonts required)
     ttf-dejavu
+    fuzzel
   )
 
   log "Installing GUI packages (Hyprland stack)..."
@@ -46,6 +47,11 @@ gui_install_tools() {
     # File manager
     thunar
     thunar-archive-plugin
+    gvfs
+    gvfs-sftp
+    gvfs-smb
+    gvfs-mtp
+    gvfs-afc
     xarchiver
     chromium
     imagemagick

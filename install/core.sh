@@ -15,7 +15,7 @@ core_install_packages() {
     gnupg openssh rsync ethtool
     dosfstools e2fsprogs ntfs-3g
     fzf zoxide zsh starship fastfetch
-    micro tmux
+    micro tmux smbclient cifs-utils nfs-utils
     wl-clipboard
   )
 
