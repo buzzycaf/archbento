@@ -24,10 +24,9 @@ wl-copy < "$TMP"
 notify-send "Screenshot" "Captured to clipboard — choose where to save"
 
 # 5) Save dialog (prefilled)
-FILE="$(env GTK_USE_PORTAL=0 zenity --file-selection \
-  --save \
-  --confirm-overwrite \
-  --filename="$DEFAULT_PATH")" || exit 0
+FILE="$(env -u WAYLAND_DISPLAY GDK_BACKEND=x11 zenity \
+  --file-selection --save --confirm-overwrite --filename="$DEFAULT_PATH")" || exit 0
+
 
 # 6) Persist to chosen location
 mv -f "$TMP" "$FILE"
