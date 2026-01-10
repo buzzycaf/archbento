@@ -11,7 +11,7 @@ core_install_packages() {
     base-devel curl wget ripgrep fd unzip zip tar
     tree bat which dnsutils
     htop lsof pciutils usbutils
-    networkmanager iperf3
+    networkmanager iperf3 jq
     gnupg openssh rsync ethtool
     dosfstools e2fsprogs ntfs-3g
     fzf zoxide zsh starship fastfetch
