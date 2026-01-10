@@ -90,6 +90,15 @@ dotfiles_link_all() {
   run "mkdir -p '$target_home/.config/ghostty'"
   [[ -d "$REPO_DIR/ghostty" ]] && link_dir_contents "$REPO_DIR/ghostty" "$target_home/.config/ghostty"
 
+  # GTK dark preference (fallback for GTK3/GTK4)
+  run "mkdir -p '$target_home/.config/gtk-3.0'"
+  [[ -f "$REPO_DIR/dark-theme/gtk-3.0/settings.ini" ]] && \
+    link_file "$REPO_DIR/dark-theme/gtk-3.0/settings.ini" "$target_home/.config/gtk-3.0/settings.ini"
+ 
+  run "mkdir -p '$target_home/.config/gtk-4.0'"
+  [[ -f "$REPO_DIR/dark-theme/gtk-4.0/settings.ini" ]] && \
+    link_file "$REPO_DIR/dark-theme/gtk-4.0/settings.ini" "$target_home/.config/gtk-4.0/settings.ini"
+  
   # Save Backups
   [[ -d "$BACKUP_DIR" ]] && log "Backups saved in: $BACKUP_DIR"
 }
