@@ -12,7 +12,8 @@ gui_install_packages() {
     swww
     waybar
     ghostty
-    swayimg    
+    swayimg
+    zenity    
 
     # Clipboard + screenshots
     wl-clipboard

@@ -219,6 +219,7 @@ main() {
   fi
 
   # Core system install
+  ensure_local_bin_in_path
   core_install_packages
   core_install_yay
   core_enable_vt_switching "$USER"

@@ -119,3 +119,22 @@ mv -f \"\$tmp\" \"${sudoers_file}\"
 
   log "VT switching enabled: members of '$group' can run 'sudo $chvt_bin <N>' without a password"
 }
+
+ensure_local_bin_in_path() {
+  local profile_file="/etc/profile.d/archbento-local-bin.sh"
+
+  if [[ ! -f "$profile_file" ]]; then
+    log "Adding ~/.local/bin to PATH"
+    run "sudo tee '$profile_file' > /dev/null << 'EOF'
+# Archbento: add user-local bin to PATH
+if [ -d \"\$HOME/.local/bin\" ]; then
+  case \":\$PATH:\" in
+    *\":\$HOME/.local/bin:\"*) ;;
+    *) export PATH=\"\$HOME/.local/bin:\$PATH\" ;;
+  esac
+fi
+EOF"
+  else
+    log "~/.local/bin already present in PATH configuration"
+  fi
+}
