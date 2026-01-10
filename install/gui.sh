@@ -32,7 +32,9 @@ gui_install_packages() {
 
     # Fonts (basic, no nerd fonts required)
     ttf-dejavu
+    # Other Apps
     fuzzel
+    qalculate-gtk
   )
 
   log "Installing GUI packages (Hyprland stack)..."
