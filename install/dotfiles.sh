@@ -123,6 +123,11 @@ dotfiles_link_all() {
       log "OK: qt6ct color scheme already exists (not overwriting)"
     fi
   fi
+
+  # Fuzzel config
+  run "mkdir -p '$target_home/.config/fuzzel'"
+  [[ ! -e "$target_home/.config/fuzzel/fuzzel.ini" ]] && \
+    run "ln -s '$REPO_DIR/fuzzel/fuzzel.ini' '$target_home/.config/fuzzel/fuzzel.ini'"
   
   # Save Backups
   [[ -d "$BACKUP_DIR" ]] && log "Backups saved in: $BACKUP_DIR"
