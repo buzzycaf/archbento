@@ -6,7 +6,6 @@ set -euo pipefail
 #
 # Responsibilities:
 # - Install foundation packages (excluding git)
-# - Enable NetworkManager
 # - Symlink dotfiles into $HOME and ~/.config
 # - Backup existing files before replacing them
 #
@@ -19,12 +18,11 @@ if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
 fi
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BACKUP_DIR="${HOME}/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
 
 NO_PACKAGES=0
 DRY_RUN=0
 INCLUDE_GUI=0
-INCLUDE_GUI_TOOLS=0
+INCLUDE_GUI_TOOLS=${INCLUDE_GUI_TOOLS:-1}
 
 # -----------------------------
 # Helper functions
@@ -32,30 +30,6 @@ INCLUDE_GUI_TOOLS=0
 
 log() {
   printf "==> %s\n" "$*"
-}
-
-# Execute a command, or just print it in dry-run mode
-run() {
-  if [[ "$DRY_RUN" == "1" ]]; then
-    printf '[dry-run] %s\n' "$*"
-  else
-    eval -- "$@"
-  fi
-}
-
-# Writes to a file
-write_file() {
-  local path="$1"
-
-  if [[ "$DRY_RUN" == "1" ]]; then
-    printf '[dry-run] write %s\n' "$path"
-    # consume stdin so callers can still use heredocs
-    cat >/dev/null
-    return 0
-  fi
-
-  mkdir -p "$(dirname "$path")"
-  cat > "$path"
 }
 
 # Ensure required commands exist
@@ -68,6 +42,7 @@ need_cmd() {
 
 # Backup an existing file/symlink before overwriting
 backup_if_exists() {
+  BACKUP_DIR="${HOME}/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
   local target="$1"
   if [[ -e "$target" || -L "$target" ]]; then
     run "mkdir -p '$BACKUP_DIR'"
@@ -148,7 +123,6 @@ Usage: ./install.sh [OPTIONS]
 Options:
   --no-packages    Skip pacman package installation and service enablement
   --dry-run        Print actions without making any changes
-  --gui-tools   Install optional desktop tools (file manager, launcher, etc.)
   -h, --help       Show this help message
   --gui            Install Hyprland GUI stack (desktop packages)
 
@@ -171,7 +145,6 @@ parse_args() {
       --dry-run)     DRY_RUN=1 ;;
       --gui)
         INCLUDE_GUI=1
-        INCLUDE_GUI_TOOLS=1
         ;;
       -h|--help)     usage; exit 0 ;;
       *)
@@ -202,17 +175,11 @@ source_module() {
 
 main() {
   parse_args "$@"
-
-  source_module "dotfiles.sh"
+  export ARCHBENTO_INSTALL_CONTEXT=1
+  
   source_module "core.sh"
+  source_module "dotfiles.sh"
   source_module "gui.sh"
-
-  need_cmd pacman
-  need_cmd ln
-  need_cmd mv
-  need_cmd mkdir
-  need_cmd date
-  need_cmd readlink
 
   if [[ "$NO_PACKAGES" != "1" ]]; then
     warm_sudo
@@ -222,15 +189,20 @@ main() {
   ensure_local_bin_in_path
   core_install_packages
   core_install_yay
-  core_enable_vt_switching "$USER"
+
+  # Optional system policy: enable VT switching support (opt-in)
+  if [[ "${ARCHBENTO_ENABLE_VT_SWITCHING:-0}" == "1" ]]; then
+    core_enable_vt_switching "$USER"
+  else
+    log "Skipping VT switching setup (set ARCHBENTO_ENABLE_VT_SWITCHING=1 to enable)"
+  fi
 
   # Optional GUI install
   if [[ "$INCLUDE_GUI" == "1" ]]; then
     gui_install_packages
     gui_enable_services
     gui_install_post_login_fixes
-    gui_set_gtk_dark_mode
-    [[ "$INCLUDE_GUI_TOOLS" == "1" ]] && gui_install_tools
+    gui_install_tools
     gui_notes
   fi
 

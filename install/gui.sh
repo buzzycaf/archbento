@@ -1,44 +1,76 @@
 #!/usr/bin/env bash
-set -euo pipefail
+
+[[ "${ARCHBENTO_INSTALL_CONTEXT:-}" == "1" ]] || {
+  echo "ERROR: install/gui.sh must be sourced by install.sh" >&2
+  exit 1
+}
 
 gui_install_packages() {
-  # Honor flags
-  [[ "$NO_PACKAGES" == "1" ]] && { log "Skipping gui package install (--no-packages)..."; return; }
-
-  # Hyprland desktop stack (no display manager).
+    # Hyprland desktop stack.
   # This is a conservative starter set that boots cleanly.
+  
   local pkgs=(
-    hyprland
-    swww
-    waybar
-    ghostty
-    swayimg
-    zenity    
-    xorg-xwayland
-    papirus-icon-theme
-        
-    # Clipboard + screenshots
-    wl-clipboard
-    grim slurp wev
-    
-    # Portals (important for screenshare/file pickers, etc.)
-    xdg-desktop-portal
-    xdg-desktop-portal-hyprland
-    xdg-desktop-portal-gtk
-    
-    # Audio (PipeWire)
-    pipewire wireplumber pipewire-alsa pipewire-pulse
+    ########################################
+    #          KDE Base Backend
+    ########################################
+    systemsettings # KDE System Settings app (display, input, themes, etc.)
+    kconfig        # KDE config system (used by many KDE apps)
+    kcoreaddons    # Core KDE runtime utilities
+    kservice       # Service discovery / desktop integration
+    ki18n          # Internationalization support (quiet dependency, but needed)
+    swww           # Wayland-native wallpaper daemon for Hyprland; scriptable, lightweight, supports transitions
+    zenity         # Simple GUI dialog helper for shell scripts (file pickers, confirmations, prompts, progress); used by Wayland/Hyprland workflows and utilities
 
-    # Notifications + polkit agent
-    mako
+    # KDE I/O Layer
+    # This is what lets Dolphin, file dialogs, and Qt apps behave correctly.
+    kio            # Core virtual filesystem (trash:/, recent:/, etc.)
+    kio-extras     # smb://, sftp://, mtp://, trash integration, network browsing
+
+    # Qt theming & consistency
+    # Keeps Qt apps sane and themeable outside Plasma.
+    qt6ct           # Qt configuration tool (theme, fonts, scaling)
+    breeze          # Clean, neutral Qt widget style
+    breeze-icons    # KDE icon theme (fallback-safe, widely supported)
+
+    # (Optional but common)
+    oxygen-icons    # (optional fallback set)
+  
+    # Portals (KDE as backend, Hyprland as compositor)
+    xdg-desktop-portal          # Core portal dispatcher; routes requests to the correct backend
+    xdg-desktop-portal-kde      # KDE backend for portals (file chooser, integration)
+    xdg-desktop-portal-hyprland # Hyprland backend (Wayland-native screencast, screenshots)
+  
+    # Polkit (KDE-native agent similar to Windows UAC)
+    # Avoids GTK creep and keeps auth dialogs consistent.
     polkit
-    polkit-gnome
+    polkit-kde-agent            # this replaces polkit-gnome
 
-    # Fonts (basic, no nerd fonts required)
-    ttf-dejavu
-    # Other Apps
-    fuzzel
-    qalculate-gtk
+    ########################################
+    #    Hyprland Functional Base
+    ########################################
+    hyprland          # the compositor itself
+    xorg-xwayland     # X11 wayland emulator
+    dbus              # IPC message bus; required for desktop services to talk to each other
+  
+    ########################################
+    #    Other base functionality needed
+    ########################################
+    mako                      # enables desktop notifications
+    ttf-dejavu                # Base system font; sane default for UI text and Unicode coverage
+    ttf-jetbrains-mono-nerd   # Terminal font with Nerd Font glyphs (icons, prompts, tmux)
+    swayimg                   # Lightweight Wayland-native image viewer; fast image previews without pulling in a full desktop image suite
+  
+    # Audio stack
+    pipewire          # Core audio/video server; replaces PulseAudio + JACK
+    wireplumber       # Session/policy manager: decides which devices/apps connect and how
+    pipewire-alsa     # ALSA compatibility layer so legacy ALSA apps produce sound
+    pipewire-pulse    # PulseAudio compatibility layer for apps expecting PulseAudio
+  
+    # Screenshots and basic debugging
+    grim              # screenshot capture
+    slurp             # region selection
+    wev               # input event debugging
+    kitty             # terminal emulator
   )
 
   log "Installing GUI packages (Hyprland stack)..."
@@ -46,46 +78,73 @@ gui_install_packages() {
 }
 
 gui_install_tools() {
-  [[ "$NO_PACKAGES" == "1" ]] && { log "Skipping GUI tools (--no-packages)"; return; }
-
   # Optional desktop tools (QOL). Keep this tight.
   local pkgs=(
-    # File manager
-    thunar
-    thunar-archive-plugin
-    tumbler
-    gvfs
-    gvfs-smb
-    gvfs-mtp
-    gvfs-afc
-    xarchiver
-    chromium
-    imagemagick
+  
+    ########################################
+    #        File Managers (GUI / TUI)
+    ########################################
+    dolphin        # KDE file manager; native KIO integration (smb://, sftp://, trash:/), Qt-themed, no Plasma required
+    yazi           # Terminal file manager with GPU-accelerated previews; fast, keyboard-driven, works great in kitty
+
+    ########################################
+    #        Login & Session Management
+    ########################################
+    greetd         # Minimal login manager (display manager replacement)
+    tuigreet       # TUI greeter for greetd; keyboard-first, themeable, no GTK/Qt deps
+
+    ########################################
+    #        System Interaction Utilities
+    ########################################
+    hyprlock       # Hyprland-native lock screen
+    hypridle       # Idle detection; triggers lock/suspend actions
+    avizo          # Wayland OSD overlays (volume/brightness sliders)
+
+    ########################################
+    #        App Launchers
+    ########################################
+    fuzzel         # Wayland-native app launcher (fast, simple, no GTK/Qt baggage)
+
+    ########################################
+    #        Flatpak App Management
+    ########################################
+    flatpak        # Flatpak runtime and CLI
+    bazaar         # Flatpak-only GUI app store (clean, modern, SteamOS-style UX)
+    flatseal       # Flatpak permission manager (GUI)
+ 
+    ########################################
+    #        Input & Workflow Helpers
+    ########################################
+    cliphist       # Clipboard history manager (text + images) for wl-clipboard
+    keyd           # System-wide input remapping (TTY + Wayland-safe)
+    kwrite         # Lightweight Qt text editor (Notepad-style scratchpad)
+    qalculate-qt   # Powerful Qt-based calculator (GUI); supports units, currency, symbolic math, and scripting — lightweight desktop utility
+    kcharselect    # KDE Unicode and emoji picker; browse, search, and insert Unicode characters without pulling in Plasma
+    hyprpicker     # Hyprland-native color picker; click anywhere on screen to copy color values (hex/RGB) — Wayland-native, minimal
+
+    ########################################
+    #        Sensor Panel Providers / Helpers
+    ########################################
+    sysstat        # Disk activity telemetry (iostat) for read/write widgets
+    mesa-utils     # Cross-vendor GPU diagnostics (AMD/Intel/Mesa baseline)
+    # nvidia-utils   # NVIDIA GPU telemetry (nvidia-smi), used when applicable
+    chromium       # Default web browser + Home Assistant dashboard display
+
+    ########################################
+    #        Network Control (Optional)
+    ########################################
+    network-manager-applet   # nm-applet; quick Wi-Fi/VPN control via tray
   )
 
   log "Installing GUI tools (file manager, launcher, utilities)..."
   run "sudo pacman -S --needed --noconfirm ${pkgs[*]}"
 }
 
-gui_enable_services() {
-  [[ "$NO_PACKAGES" == "1" ]] && { log "Skipping gui enable services (--no-packages)..."; return; }
-
-  log "Enabling user audio services (WirePlumber)..."
-  run "systemctl --user enable --now wireplumber.service || true"
-
-  log "Starting user XDG Desktop Portal services (best effort)..."
-  run "systemctl --user daemon-reload >/dev/null 2>&1 || true"
-  run "systemctl --user restart xdg-desktop-portal.service >/dev/null 2>&1 || true"
-  run "systemctl --user restart xdg-desktop-portal-hyprland.service >/dev/null 2>&1 || true"
-}
-
 gui_install_post_login_fixes() {
-  [[ "$NO_PACKAGES" == "1" ]] && { log "Skipping post-login fixes (--no-packages)..."; return; }
-
   log "Installing post-login fixes (portals)..."
 
-  run "mkdir -p '$HOME/.local/bin' '$HOME/.local/state/archbento' '$HOME/.config/systemd/user' '$HOME/.config/hypr'"
-
+  run "mkdir -p '$HOME/.local/bin' '$HOME/.local/state/archbento' '$HOME/.config/systemd/user'"
+  
   # 1) Script: one-time portal enable/restart with a stamp file
   write_file "$HOME/.local/bin/archbento-portal-fix.sh" <<'EOF'
 #!/usr/bin/env bash
@@ -121,12 +180,14 @@ EOF
   log "Enabling archbento-portal-fix user service (best effort)..."
   run "systemctl --user daemon-reload >/dev/null 2>&1 || true"
   run "systemctl --user enable --now archbento-portal-fix.service >/dev/null 2>&1 || true"
+}
 
-  # 4) Hyprland fallback via dedicated include file (won't be clobbered by dotfiles)
-  write_file "$HOME/.config/hypr/archbento-postlogin.conf" <<'EOF'
-# Archbento: post-login one-time fixups
-exec-once = ~/.local/bin/archbento-portal-fix.sh
-EOF
+gui_enable_services() {
+  log "Enabling user audio services (WirePlumber)..."
+  run "systemctl --user enable --now wireplumber.service || true"
+
+  log "Starting user XDG Desktop Portal services (best effort)..."
+  run "systemctl --user daemon-reload >/dev/null 2>&1 || true"
 }
 
 gui_notes() {
@@ -136,6 +197,7 @@ gui_notes() {
   echo "  - later we’ll add a safe autostart in ~/.zprofile"
 }
 
+# This function isn't being currently used in main(), but leaving it just in case.
 gui_set_gtk_dark_mode() {
   log "Setting GTK dark mode preference (prefer-dark)..."
 

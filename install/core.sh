@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-set -euo pipefail
+
+[[ "${ARCHBENTO_INSTALL_CONTEXT:-}" == "1" ]] || {
+  echo "ERROR: install/core.sh must be sourced by install.sh" >&2
+  exit 1
+}
 
 core_install_packages() {
   # Honor flags
@@ -21,13 +25,6 @@ core_install_packages() {
 
   log "Installing core packages (excluding git)..."
   run "sudo pacman -S --needed --noconfirm ${pkgs[*]}"
-}
-
-core_enable_networking() {
-  # Honor flags
-  [[ "$NO_PACKAGES" == "1" ]] && { log "Skipping enable networking (--no-packages)"; return; }
-  log "Enabling NetworkManager..."
-  run "sudo systemctl enable --now NetworkManager"
 }
 
 core_install_yay() {
@@ -137,4 +134,28 @@ EOF"
   else
     log "~/.local/bin already present in PATH configuration"
   fi
+}
+
+# Execute a command, or just print it in dry-run mode
+run() {
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf '[dry-run] %s\n' "$*"
+  else
+    eval -- "$@"
+  fi
+}
+
+# Writes to a file
+write_file() {
+  local path="$1"
+
+  if [[ "$DRY_RUN" == "1" ]]; then
+    printf '[dry-run] write %s\n' "$path"
+    # consume stdin so callers can still use heredocs
+    cat >/dev/null
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$path")"
+  cat > "$path"
 }

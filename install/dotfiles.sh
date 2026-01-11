@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-set -euo pipefail
+
+[[ "${ARCHBENTO_INSTALL_CONTEXT:-}" == "1" ]] || {
+  echo "ERROR: install/dotfiles.sh must be sourced by install.sh" >&2
+  exit 1
+}
 
 dotfiles_link_all() {
   log "Linking dotfiles from $REPO_DIR"
@@ -20,8 +24,6 @@ dotfiles_link_all() {
 
   # starship
   if [[ -d "$REPO_DIR/starship" ]]; then
-    run "mkdir -p '$target_home/.config/starship'"
-
     [[ -f "$REPO_DIR/starship/starship.toml" ]] && \
       link_file "$REPO_DIR/starship/starship.toml" "$target_home/.config/starship/starship.toml"
 
@@ -38,8 +40,6 @@ dotfiles_link_all() {
 
   # fastfetch
   if [[ -d "$REPO_DIR/fastfetch" ]]; then
-    run "mkdir -p '$target_home/.config/fastfetch'"
-
     # Main config (keep for backward compatibility if you still ship it)
     [[ -f "$REPO_DIR/fastfetch/config.jsonc" ]] && \
       link_file "$REPO_DIR/fastfetch/config.jsonc" "$target_home/.config/fastfetch/config.jsonc"
@@ -74,20 +74,16 @@ dotfiles_link_all() {
   fi
 
   # zsh extra files
-  run "mkdir -p '$target_home/.zsh'"
   [[ -f "$REPO_DIR/zsh/aliases.zsh" ]] && \
     link_file "$REPO_DIR/zsh/aliases.zsh" "$target_home/.zsh/aliases.zsh"
 
   # Hyprland
-  run "mkdir -p '$target_home/.config/hypr'"
   [[ -d "$REPO_DIR/hypr"    ]] && link_dir_contents "$REPO_DIR/hypr"    "$target_home/.config/hypr"
   
   # Waybar
-  run "mkdir -p '$target_home/.config/waybar'"
   [[ -d "$REPO_DIR/waybar"  ]] && link_dir_contents "$REPO_DIR/waybar"  "$target_home/.config/waybar"
   
   # Ghostty
-  run "mkdir -p '$target_home/.config/ghostty'"
   [[ -d "$REPO_DIR/ghostty" ]] && link_dir_contents "$REPO_DIR/ghostty" "$target_home/.config/ghostty"
 
   # GTK dark preference (fallback for GTK3/GTK4)
@@ -100,10 +96,8 @@ dotfiles_link_all() {
     link_file "$REPO_DIR/dark-theme/gtk-4.0/settings.ini" "$target_home/.config/gtk-4.0/settings.ini"
 
   # QT dark preference (copy once; user-editable)
-  run "mkdir -p '$target_home/.config/qt6ct'"
-  run "mkdir -p '$target_home/.config/qt6ct/colors'"
-  run "mkdir -p '$target_home/.config/qt6ct/qss'"
-  
+  run "mkdir -p '$target_home/.config/qt6ct' '$target_home/.config/qt6ct/colors' '$target_home/.config/qt6ct/qss'"
+    
   # qt6ct main config
   if [[ -f "$REPO_DIR/dark-theme/qt/qt6ct.conf" ]]; then
     if [[ ! -e "$target_home/.config/qt6ct/qt6ct.conf" ]]; then
@@ -138,7 +132,6 @@ dotfiles_link_all() {
   if [[ -f "$REPO_DIR/bin/screenshot.sh" ]]; then
     if [[ ! -f "$target_home/.local/bin/screenshot.sh" ]]; then
       log "Installing screenshot helper script"
-      run "mkdir -p '$target_home/.local/bin'"
       run "cp '$REPO_DIR/bin/screenshot.sh' '$target_home/.local/bin/screenshot.sh'"
       run "chmod +x '$target_home/.local/bin/screenshot.sh'"
     else
