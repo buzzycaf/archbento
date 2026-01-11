@@ -90,15 +90,15 @@ gui_install_tools() {
     ########################################
     #        Login & Session Management
     ########################################
-    greetd         # Minimal login manager (display manager replacement)
-    tuigreet       # TUI greeter for greetd; keyboard-first, themeable, no GTK/Qt deps
+    greetd-tuigreet  # Minimal login manager (display manager replacement)
+    # tuigreet       # TUI greeter for greetd; keyboard-first, themeable, no GTK/Qt deps
 
     ########################################
     #        System Interaction Utilities
     ########################################
     hyprlock       # Hyprland-native lock screen
     hypridle       # Idle detection; triggers lock/suspend actions
-    avizo          # Wayland OSD overlays (volume/brightness sliders)
+    # avizo          # Wayland OSD overlays (volume/brightness sliders)
 
     ########################################
     #        App Launchers
@@ -110,7 +110,7 @@ gui_install_tools() {
     ########################################
     flatpak        # Flatpak runtime and CLI
     bazaar         # Flatpak-only GUI app store (clean, modern, SteamOS-style UX)
-    flatseal       # Flatpak permission manager (GUI)
+    # flatseal       # Flatpak permission manager (GUI)
  
     ########################################
     #        Input & Workflow Helpers
