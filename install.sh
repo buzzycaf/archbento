@@ -203,6 +203,8 @@ main() {
     gui_enable_services
     gui_install_post_login_fixes
     gui_install_tools
+    gui_install_tools_aur
+    gui_install_tools_flatpak
     gui_notes
   fi
 

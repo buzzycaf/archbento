@@ -90,15 +90,13 @@ gui_install_tools() {
     ########################################
     #        Login & Session Management
     ########################################
-    greetd-tuigreet  # Minimal login manager (display manager replacement)
-    # tuigreet       # TUI greeter for greetd; keyboard-first, themeable, no GTK/Qt deps
+    greetd-tuigreet  # Minimal login manager (display manager replacement) TUI greeter for greetd; keyboard-first, themeable, no GTK/Qt deps
 
     ########################################
     #        System Interaction Utilities
     ########################################
     hyprlock       # Hyprland-native lock screen
     hypridle       # Idle detection; triggers lock/suspend actions
-    # avizo          # Wayland OSD overlays (volume/brightness sliders)
 
     ########################################
     #        App Launchers
@@ -138,6 +136,53 @@ gui_install_tools() {
 
   log "Installing GUI tools (file manager, launcher, utilities)..."
   run "sudo pacman -S --needed --noconfirm ${pkgs[*]}"
+}
+
+gui_install_tools_aur() {
+  # Optional desktop tools from AUR only.
+  # This function assumes yay is already installed and working.
+  local pkgs=(
+
+    ########################################
+    #        Wayland / Desktop Enhancements
+    ########################################
+    avizo          # Wayland OSD overlays (volume/brightness sliders); lightweight, compositor-agnostic
+
+    ########################################
+    #        (Future AUR GUI Tools)
+    ########################################
+    # example-aur-pkg
+  )
+
+  # If nothing is enabled yet, exit cleanly
+  [[ ${#pkgs[@]} -eq 0 ]] && return 0
+
+  log "Installing GUI tools from AUR (yay)..."
+  run "yay -S --needed --noconfirm ${pkgs[*]}"
+}
+
+gui_install_tools_flatpak() {
+  # Optional GUI tools delivered via Flatpak only.
+  # Flatseal lives on Flathub and should never be installed via pacman or AUR.
+
+  # Ensure flatpak exists (installed earlier via pacman)
+  if ! command -v flatpak >/dev/null 2>&1; then
+    log "Flatpak not found; skipping Flatpak GUI tools."
+    return 0
+  fi
+
+  # Ensure Flathub remote exists
+  if ! flatpak remote-list | awk '{print $1}' | grep -qx flathub; then
+    log "Adding Flathub remote..."
+    run "flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"
+  fi
+
+  local pkgs=(
+    com.github.tchx84.Flatseal   # Flatpak permission manager (GUI)
+  )
+
+  log "Installing GUI tools from Flatpak (Flathub)..."
+  run "flatpak install -y flathub ${pkgs[*]}"
 }
 
 gui_install_post_login_fixes() {
